@@ -1,0 +1,23 @@
+name: 🔒 Snyk snyky exit codes
+on:
+  workflow_dispatch:
+    outputs:
+      exit_code:
+        value: ${{ jobs.scan.outputs.exit_code }}
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    outputs:
+      exit_code: ${{ steps.scan.outputs.exit_code }}
+    steps:
+      - name: Clone repository to be scanned
+        uses: actions/checkout@master
+      - name: Install Snyk CLI
+        uses: snyk/actions/setup@master
+      - name: Scan IAC
+        id: scan
+        run: snyk iac test; echo "EXIT_CODE=$?" >> $GITHUB_ENV
+      - name: test output
+        if: always()
+        run: echo "$EXIT_CODE"
